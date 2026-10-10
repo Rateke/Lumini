@@ -8,7 +8,7 @@
 | `brand/assets/trailer/lumini-trailer-16x9.mp4` | YouTube, site, apresentações |
 | `brand/assets/trailer/lumini-trailer-9x16.mp4` | Reels, TikTok, Shorts, Stories |
 | `brand/trailer.html` | Versão interativa (toca no navegador; botão para alternar 16:9 / 9:16) |
-| `brand/assets/trailer/lumini-trailer-audio.m4a` | Trilha original, sintetizada em código |
+| `brand/assets/trailer/lumini-trailer-audio.mp3` | Trilha original, sintetizada em código |
 
 ## Ideia
 

@@ -27,7 +27,7 @@ const opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null
 const fmts = opt('--fmt') ? [opt('--fmt')] : ['16x9', '9x16'];
 const testFrames = opt('--frames');
 const SIZE = { '16x9': [1920, 1080], '9x16': [1080, 1920] };
-const audio = ['wav', 'm4a'].map(e => resolve(out, `lumini-trailer-audio.${e}`)).find(f => existsSync(f));
+const audio = ['wav', 'mp3'].map(e => resolve(out, `lumini-trailer-audio.${e}`)).find(f => existsSync(f));
 
 const browser = await chromium.launch();
 for (const fmt of fmts) {

@@ -204,11 +204,13 @@ main { position: relative; z-index: 2; }
 /* ---------- revelações ---------- */
 .rv-line { display: inline-block; overflow: hidden; vertical-align: top; padding: .12em .1em .16em 0; margin: -.12em -.1em -.16em 0; }
 .rv-line > span { display: inline-block; }
-.js .is-split .rv-line > span { transform: translateY(115%) rotate(4deg); transform-origin: 0 100%; transition: transform 1.3s var(--mare) var(--wd, 0s); }
-.js .is-split.is-in .rv-line > span { transform: none; }
+.is-split .rv-line > span { transform-origin: 0 100%; }
+.js .is-split.is-in .rv-line > span { animation: rise 1.3s var(--mare) var(--wd, 0s) both; }
+@keyframes rise { from { transform: translateY(115%) rotate(4deg); } to { transform: none; } }
 .em-split { font-style: italic; }
-.js .rv { opacity: 0; transform: translateY(28px); filter: blur(8px); }
-.rv.is-in { opacity: 1; transform: none; filter: none; transition: opacity 1.1s var(--mare), transform 1.2s var(--mare), filter 1.1s var(--mare); transition-delay: var(--d, 0s); }
+/* o estado de repouso é visível; a animação só toca quando o elemento chega */
+.js .rv.is-in { animation: emerge 1.15s var(--mare) var(--d, 0s) both; }
+@keyframes emerge { from { opacity: 0; transform: translateY(28px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
 
 /* =========================================================
    HERO (0 m)
@@ -524,6 +526,9 @@ main { position: relative; z-index: 2; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form__actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 4px; }
 .form__note { color: var(--nevoa); font-size: 13px; }
+.ready { display: grid; gap: 12px; padding: 18px; border-radius: 16px; background: rgba(111, 242, 220, .07); border: 1px solid rgba(111, 242, 220, .3); }
+.ready .mono { color: var(--bio); }
+.ready pre { margin: 0; white-space: pre-wrap; font-family: var(--f-text); font-size: 14px; color: var(--bruma); max-height: 180px; overflow: auto; }
 option { background: var(--abismo); color: var(--espuma); }
 
 /* =========================================================
@@ -587,12 +592,14 @@ option { background: var(--abismo); color: var(--espuma); }
 
 /* modo de captura (revisão com Playwright): sem transições */
 .shot *, .shot *::before, .shot *::after { transition: none !important; animation-play-state: paused !important; }
+.shot .rv, .shot .rv-line > span { animation: none !important; }
 
 /* sem JS / sem WebGL */
 .no-webgl body { background: linear-gradient(var(--superficie), var(--crepusculo) 25%, var(--abismo) 55%, var(--crepusculo) 80%, var(--raso)); }
 
 @media (min-width: 1181px) {
   main .wrap, .beach .wrap { padding-right: calc(var(--gutter) + 84px); }
+  .hero__shell-note { right: calc(var(--gutter) + 84px); }
   .tales__track { padding-right: calc(var(--gutter) + 84px); }
 }
 
@@ -676,7 +683,6 @@ option { background: var(--abismo); color: var(--espuma); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
-  .js .rv { opacity: 1; transform: none; filter: none; }
   .grain { display: none; }
 }
 

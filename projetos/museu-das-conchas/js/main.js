@@ -87,7 +87,7 @@ $$('[data-split]').forEach(split);
 /* revelação ao entrar na tela */
 const io = new IntersectionObserver(entries => {
   for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
-}, { rootMargin: '0px 0px -8% 0px', threshold: .12 });
+}, { rootMargin: '0px 0px 12% 0px', threshold: 0 });
 function watchReveals() { $$('.rv, [data-split]').forEach(el => { if (el.closest('.hero')) return; io.observe(el); }); }
 
 /* ---------------------------------------------------------------
@@ -105,7 +105,7 @@ async function intro() {
   }
   const draw = gsap.to(paths, { strokeDashoffset: 0, duration: 1.8, ease: 'power2.inOut', stagger: .15 });
   const counter = gsap.to(st, { v: 86, duration: 1.6, ease: 'power1.out', onUpdate: () => { count.textContent = Math.round(st.v); } });
-  await Promise.race([Promise.all([fonts, oceanReady, new Promise(r => setTimeout(r, 1400))]), new Promise(r => setTimeout(r, 4500))]);
+  await Promise.race([Promise.all([fonts, oceanReady, new Promise(r => setTimeout(r, 1100))]), new Promise(r => setTimeout(r, 3000))]);
   counter.kill(); draw.progress(1);
   await gsap.to(st, { v: 100, duration: .4, ease: 'power1.out', onUpdate: () => { count.textContent = Math.round(st.v); } });
   const tl = gsap.timeline();
@@ -598,13 +598,21 @@ function form() {
     const v = k => f.elements[k].value.trim();
     const [yy, mm, dd] = v('data').split('-');
     const text = `Olá! Gostaria de agendar uma visita ao Museu das Conchas.\n\nEscola/grupo: ${v('escola')}\nResponsável: ${v('nome')}\nTelefone: ${v('tel')}\nData desejada: ${dd}/${mm}/${yy}\nPessoas: ${v('qtd')}\nFaixa etária: ${v('idade')}${v('msg') ? '\nMensagem: ' + v('msg') : ''}`;
-    if (via === 'mail') {
-      location.href = `mailto:contato@museudasconchas.com.br?subject=${encodeURIComponent('Agendamento de visita: ' + v('escola'))}&body=${encodeURIComponent(text)}`;
-      toast('Abrimos seu e-mail com o pedido pronto. É só enviar.');
-    } else {
-      window.open(`https://wa.me/5548996267470?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
-      toast('Abrimos o WhatsApp com o pedido pronto. É só enviar.');
-    }
+    const wa = `https://wa.me/5548996267470?text=${encodeURIComponent(text)}`;
+    const mail = `mailto:contato@museudasconchas.com.br?subject=${encodeURIComponent('Agendamento de visita: ' + v('escola'))}&body=${encodeURIComponent(text)}`;
+    const box = $('[data-ready]', f);
+    $('[data-ready-text]', box).textContent = text;
+    $('[data-ready-wa]', box).href = wa; $('[data-ready-mail]', box).href = mail;
+    box.hidden = false;
+    const go = $(via === 'mail' ? '[data-ready-mail]' : '[data-ready-wa]', box);
+    go.focus({ preventScroll: true });
+    box.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+    toast(via === 'mail' ? 'Pedido pronto. Toque em "Abrir no e-mail" para enviar.' : 'Pedido pronto. Toque em "Abrir no WhatsApp" para enviar.');
+  });
+  $('[data-ready-copy]', f).addEventListener('click', async () => {
+    const pre = $('[data-ready-text]', f);
+    try { await navigator.clipboard.writeText(pre.textContent); toast('Texto copiado.'); }
+    catch { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Texto selecionado. Copie com Ctrl+C.'); }
   });
 }
 

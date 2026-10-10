@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Museu das Conchas Itapirubá · Mergulhe sem se molhar</title>
+<title>Museu das Conchas Itapirubá</title>
 <meta name="description" content="Mais de 2.000 espécies de conchas de todos os oceanos, numa casa de frente para o mar de Itapirubá, em Imbituba (SC). Horários, ingressos, como chegar, visitas de escolas e muito sobre o mundo das conchas.">
 <meta name="theme-color" content="#0A3550">
 <link rel="canonical" href="https://www.museudasconchas.com.br/">
@@ -520,7 +520,7 @@
     </div>
     <form class="form rv" data-form novalidate>
       <h3 class="h3">Pedido de agendamento</h3>
-      <p class="form__note">O pedido abre no seu WhatsApp ou e-mail já preenchido. Nada é enviado sem você confirmar.</p>
+      <p class="form__note">A gente monta a mensagem para você mandar pelo WhatsApp ou por e-mail. Nada é enviado sem você confirmar.</p>
       <div class="field"><label for="f-esc">Escola ou grupo</label><input id="f-esc" name="escola" required autocomplete="organization" placeholder="Ex.: EEB Itapirubá, 5º ano"><span class="err" data-err="escola"></span></div>
       <div class="row2">
         <div class="field"><label for="f-nome">Responsável</label><input id="f-nome" name="nome" required autocomplete="name"><span class="err" data-err="nome"></span></div>
@@ -536,6 +536,16 @@
       <div class="form__actions">
         <button class="btn btn--bio" type="submit" data-via="wa">Enviar pelo WhatsApp <svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg></button>
         <button class="btn btn--ghost btn--sm" type="submit" data-via="mail">ou por e-mail</button>
+      </div>
+      <div class="ready" data-ready hidden>
+        <p class="mono">Pedido pronto</p>
+        <pre data-ready-text></pre>
+        <div class="btns">
+          <a class="btn btn--bio btn--sm" data-ready-wa href="https://wa.me/5548996267470" target="_blank" rel="noopener">Abrir no WhatsApp <svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg></a>
+          <a class="btn btn--ghost btn--sm" data-ready-mail href="mailto:contato@museudasconchas.com.br">Abrir no e-mail <svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg></a>
+          <button class="btn btn--ghost btn--sm" type="button" data-ready-copy>Copiar texto <svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg></button>
+        </div>
+        <p class="form__note">Se o app não abrir, copie o texto e mande para (48) 99626-7470 ou contato@museudasconchas.com.br.</p>
       </div>
     </form>
   </div>

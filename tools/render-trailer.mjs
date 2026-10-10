@@ -8,7 +8,8 @@
 // Requisitos: Playwright (Chromium) e ffmpeg no PATH.
 // Áudio: rode antes `python3 tools/trailer-audio.py` para gerar a trilha.
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
@@ -49,9 +50,10 @@ for (const fmt of fmts) {
 
   const total = Math.round(DURATION * FPS);
   const mp4 = resolve(out, `lumini-trailer-${fmt}.mp4`);
-  const ffArgs = ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-'];
-  if (audio) ffArgs.push('-i', audio, '-c:a', 'aac', '-b:a', '192k', '-shortest');
-  ffArgs.push('-c:v', 'libx264', '-preset', 'slow', '-crf', fmt === '16x9' ? '20' : '21', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', mp4);
+  const master = resolve(tmpdir(), `lumini-master-${fmt}.mp4`);
+  // 1) master de alta qualidade (o grão muda a cada quadro, então ele fica pesado)
+  const ffArgs = ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
+    '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '16', '-pix_fmt', 'yuv420p', master];
   const ff = spawn('ffmpeg', ffArgs, { stdio: ['pipe', 'inherit', 'inherit'] });
   const t0 = Date.now();
   for (let f = 0; f < total; f++) {
@@ -62,6 +64,13 @@ for (const fmt of fmts) {
   }
   ff.stdin.end();
   await new Promise((r, j) => ff.on('close', c => (c === 0 ? r() : j(new Error('ffmpeg saiu com código ' + c)))));
+  // 2) versão web: duas passagens a 2.6 Mbps com redução leve de grão (~14 MB para 40 s)
+  const run = a => new Promise((r, j) => spawn('ffmpeg', a, { stdio: 'inherit', cwd: tmpdir() }).on('close', c => (c === 0 ? r() : j(new Error('ffmpeg ' + c)))));
+  const venc = ['-vf', 'hqdn3d=3:2:5:4', '-c:v', 'libx264', '-preset', 'slow', '-b:v', '2600k', '-passlogfile', `lumini-${fmt}`];
+  await run(['-y', '-loglevel', 'error', '-i', master, ...venc, '-pass', '1', '-an', '-f', 'mp4', '/dev/null']);
+  await run(['-y', '-loglevel', 'error', '-i', master, ...(audio ? ['-i', audio, '-map', '0:v', '-map', '1:a', '-c:a', 'aac', '-b:a', '160k', '-shortest'] : []),
+    ...venc, '-pass', '2', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', mp4]);
+  rmSync(master, { force: true });
   // pôster: quadro com logo + slogan
   await page.evaluate(t => window.seek(t), 33.2);
   await page.screenshot({ path: resolve(out, `poster-${fmt}.jpg`), type: 'jpeg', quality: 90 });

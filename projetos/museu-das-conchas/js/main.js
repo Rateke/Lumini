@@ -170,6 +170,7 @@ function onScroll() {
   if (waterAt) document.body.style.setProperty('--water', '#' + waterAt(d).bottom.getHexString());
   sea?.setDepth(d);
   $('.depth').classList.toggle('on-sand', d < -.5);
+  $('.wa-fab').classList.toggle('is-on', y > vh * .6 && !document.body.classList.contains('is-loading'));
   header(y);
 }
 
@@ -189,7 +190,7 @@ const navLinks = $$('.nav a');
 const navIO = new IntersectionObserver(es => {
   for (const e of es) if (e.isIntersecting) navLinks.forEach(a => a.classList.toggle('is-on', a.getAttribute('href') === '#' + e.target.id));
 }, { rootMargin: '-45% 0px -50% 0px' });
-['museu', 'acervo', 'gigantes', 'itapiruba', 'escolas', 'visite'].forEach(id => $('#' + id) && navIO.observe($('#' + id)));
+['museu', 'acervo', 'tour', 'itapiruba', 'escolas', 'visite'].forEach(id => $('#' + id) && navIO.observe($('#' + id)));
 
 const burger = $('.burger'), menu = $('#menu');
 function openMenu() { menu.hidden = false; requestAnimationFrame(() => menu.classList.add('is-open')); burger.setAttribute('aria-expanded', 'true'); burger.setAttribute('aria-label', 'Fechar menu'); lenis?.stop(); }
@@ -374,7 +375,7 @@ async function openSheet(id, ev) {
   box.style.setProperty('--ox', ((x - r.left) / r.width * 100).toFixed(1) + '%');
   box.style.setProperty('--oy', ((y - r.top) / r.height * 100).toFixed(1) + '%');
   requestAnimationFrame(() => sheet.classList.add('is-open'));
-  lenis?.stop(); document.documentElement.style.overflow = 'hidden';
+  lenis?.stop(); document.documentElement.style.overflow = 'hidden'; document.body.classList.add('sheet-open');
   history.replaceState(null, '', '#concha-' + id);
   setTimeout(() => $('.sheet__close', sheet).focus({ preventScroll: true }), 50);
   try {
@@ -395,7 +396,7 @@ function fillSheet(s) {
 function closeSheet() {
   if (!sheet.classList.contains('is-open')) return;
   sheet.classList.remove('is-open');
-  lenis?.start(); document.documentElement.style.overflow = '';
+  lenis?.start(); document.documentElement.style.overflow = ''; document.body.classList.remove('sheet-open');
   history.replaceState(null, '', '#acervo');
   setTimeout(() => { if (!sheet.classList.contains('is-open')) { sheet.hidden = true; viewer?.stop(); } }, 900);
   lastFocus?.focus?.({ preventScroll: true });
@@ -572,47 +573,31 @@ function calc() {
 }
 
 /* ---------------------------------------------------------------
-   Formulário de escolas → WhatsApp ou e-mail
+   Aviso rápido (copiar endereço etc.)
    --------------------------------------------------------------- */
 const toastEl = $('[data-toast]');
 function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('is-on'); clearTimeout(toast.t); toast.t = setTimeout(() => toastEl.classList.remove('is-on'), 3800); }
-function form() {
-  const f = $('[data-form]'); if (!f) return;
-  const date = $('#f-data'); const n = nowBR();
-  date.min = `${n.y}-${String(n.m).padStart(2, '0')}-${String(n.d).padStart(2, '0')}`;
-  const MSG = { escola: 'Diga o nome da escola ou do grupo.', nome: 'Quem é o responsável?', tel: 'Deixe um telefone com DDD.', data: 'Escolha uma data a partir de hoje.', qtd: 'Quantas pessoas, mais ou menos?' };
-  let via = 'wa';
-  $$('[type="submit"]', f).forEach(b => b.addEventListener('click', () => { via = b.dataset.via; }));
-  f.addEventListener('submit', e => {
-    e.preventDefault();
-    let ok = true, first = null;
-    for (const k of Object.keys(MSG)) {
-      const el = f.elements[k], err = $(`[data-err="${k}"]`, f);
-      let bad = !el.value.trim() || !el.checkValidity();
-      if (k === 'tel' && el.value.replace(/\D/g, '').length < 10) bad = true;
-      err.textContent = bad ? MSG[k] : '';
-      el.setAttribute('aria-invalid', bad ? 'true' : 'false');
-      if (bad) { ok = false; first ||= el; }
-    }
-    if (!ok) { first.focus(); return; }
-    const v = k => f.elements[k].value.trim();
-    const [yy, mm, dd] = v('data').split('-');
-    const text = `Olá! Gostaria de agendar uma visita ao Museu das Conchas.\n\nEscola/grupo: ${v('escola')}\nResponsável: ${v('nome')}\nTelefone: ${v('tel')}\nData desejada: ${dd}/${mm}/${yy}\nPessoas: ${v('qtd')}\nFaixa etária: ${v('idade')}${v('msg') ? '\nMensagem: ' + v('msg') : ''}`;
-    const wa = `https://wa.me/5548996267470?text=${encodeURIComponent(text)}`;
-    const mail = `mailto:contato@museudasconchas.com.br?subject=${encodeURIComponent('Agendamento de visita: ' + v('escola'))}&body=${encodeURIComponent(text)}`;
-    const box = $('[data-ready]', f);
-    $('[data-ready-text]', box).textContent = text;
-    $('[data-ready-wa]', box).href = wa; $('[data-ready-mail]', box).href = mail;
-    box.hidden = false;
-    const go = $(via === 'mail' ? '[data-ready-mail]' : '[data-ready-wa]', box);
-    go.focus({ preventScroll: true });
-    box.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
-    toast(via === 'mail' ? 'Pedido pronto. Toque em "Abrir no e-mail" para enviar.' : 'Pedido pronto. Toque em "Abrir no WhatsApp" para enviar.');
-  });
-  $('[data-ready-copy]', f).addEventListener('click', async () => {
-    const pre = $('[data-ready-text]', f);
-    try { await navigator.clipboard.writeText(pre.textContent); toast('Texto copiado.'); }
-    catch { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Texto selecionado. Copie com Ctrl+C.'); }
+
+/* ---------------------------------------------------------------
+   Tour 360° do Google Maps: só carrega quando a pessoa pede
+   --------------------------------------------------------------- */
+function tour() {
+  const box = $('[data-tour]'); if (!box) return;
+  const btn = $('[data-tour-load]', box);
+  // onde não é possível incorporar outros sites, o botão vira link direto
+  if (document.documentElement.dataset.noembed !== undefined) {
+    btn.remove();
+    $('.form__note', box).textContent = 'O tour abre no Google Maps, em uma nova aba.';
+    return;
+  }
+  btn.addEventListener('click', () => {
+    const f = document.createElement('iframe');
+    f.src = box.dataset.embed; f.title = 'Tour 360° do Museu das Conchas no Google Maps';
+    f.loading = 'lazy'; f.allow = 'fullscreen; accelerometer; gyroscope'; f.referrerPolicy = 'no-referrer-when-downgrade';
+    box.appendChild(f); box.classList.add('is-live');
+    const link = $('[data-tour-link]', box).cloneNode(true);
+    link.className = 'btn btn--sm'; link.style.cssText = 'position:absolute;right:14px;bottom:14px;z-index:3';
+    box.appendChild(link);
   });
 }
 
@@ -674,7 +659,7 @@ $('[data-sound]').addEventListener('click', async e => {
 /* ---------------------------------------------------------------
    Início
    --------------------------------------------------------------- */
-cards(); anatomy(); buildGrowth(); tales(); giants(); founder(); calc(); form(); faq(); waves();
+cards(); anatomy(); buildGrowth(); tales(); giants(); founder(); calc(); tour(); faq(); waves();
 status(); setInterval(status, 60e3);
 measure(); onScroll();
 ScrollTrigger.addEventListener('refresh', () => { measure(); onScroll(); });

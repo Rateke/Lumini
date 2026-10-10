@@ -11,7 +11,7 @@ Este repositório guarda a **identidade visual** da marca, base para o futuro si
 
 | Projeto | O que é |
 |---|---|
-| [`projetos/museu-das-conchas/`](projetos/museu-das-conchas/) | Site conceito do **Museu das Conchas Itapirubá** (Imbituba, SC): um mergulho do topo ao abismo e de volta à praia, com oceano em WebGL, 12 conchas 3D geradas por código, horário ao vivo, calculadora de ingressos, agendamento de escolas e um guia da marca do museu. Detalhes e fontes em [`docs/museu-das-conchas.md`](docs/museu-das-conchas.md). |
+| [`projetos/museu-das-conchas/`](projetos/museu-das-conchas/) | Site conceito do **Museu das Conchas Itapirubá** (Imbituba, SC), "um lugar como você nunca viu": um mergulho do topo ao abismo e de volta à praia, com oceano em WebGL, 12 conchas 3D geradas por código, tour 360° do Google Maps, horário ao vivo, calculadora de ingressos, agendamento pelo WhatsApp (sem banco de dados) e um guia da marca com o múrex como símbolo. Detalhes e fontes em [`docs/museu-das-conchas.md`](docs/museu-das-conchas.md). |
 
 ## O que tem aqui
 

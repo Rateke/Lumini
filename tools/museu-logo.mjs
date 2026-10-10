@@ -1,7 +1,7 @@
 // Gera os SVGs da marca do Museu das Conchas a partir da geometria.
 //
-// O símbolo é o corte de um náutilo: uma espiral logarítmica que cresce 3x a
-// cada volta (como o náutilo de verdade) com as câmaras de flutuação (septos).
+// O símbolo é o múrex, a concha que o museu já usa como marca: corpo em fuso,
+// espira com suturas, canal longo e fileiras de espinhos curvados para cima.
 // O texto é convertido em contornos com opentype.js, então os SVGs não dependem
 // de fontes instaladas.
 //
@@ -38,46 +38,88 @@ const F = { display: await font('display'), italic: await font('italic'), mono: 
 // ---------- cores ----------
 const C = { abismo: '#04121D', crepusculo: '#0A3550', espuma: '#EAF5F2', nacar: '#F4E9DC', areia: '#E8CFA0', bio: '#6FF2DC', fossa: '#02080E' };
 
-// ---------- símbolo: espiral de câmaras ----------
-const TAU = Math.PI * 2, b = Math.log(3) / TAU;
-const r = th => Math.exp(b * th);
-const pt = th => [r(th) * Math.cos(th), -r(th) * Math.sin(th)];
+// ---------- símbolo: o múrex ----------
+// Corpo em fuso desenhado por meia-silhueta espelhada (Catmull-Rom), espira com
+// suturas, abertura e fileiras de espinhos que nascem do contorno e curvam para cima.
+const TAU = Math.PI * 2;
 const f2 = n => +n.toFixed(2);
-function symbolPaths({ turns = 2.5, chambers = 11, living = .3, curve = .38 } = {}) {
-  const th1 = 0, th0 = -turns * TAU;
-  const spiral = [];
-  for (let th = th0; th <= th1 + 1e-9; th += .04) spiral.push(pt(th));
-  const septa = [];
-  const step = TAU / chambers;
-  for (let th = th1 - living * TAU; th - TAU > th0 + .12 * TAU; th -= step) {
-    const a = pt(th - TAU), o = pt(th);
-    const rm = (r(th - TAU) + r(th)) / 2, tc = th - curve;
-    septa.push([a, [rm * Math.cos(tc), -rm * Math.sin(tc)], o]);
+const HALF = [[0, 4], [2.4, 8.5], [5.2, 14], [8, 19.5], [10.6, 24.5], [14, 29.5], [16.4, 36.5], [16.2, 44.5], [13.4, 52.5], [8.6, 58.6], [5, 63], [3.6, 71], [2.6, 81], [1.3, 91], [0, 96]];
+function cr(pts, steps = 10) { // Catmull-Rom aberta
+  const out = [];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+    for (let k = 0; k < steps; k++) {
+      const t = k / steps, t2 = t * t, t3 = t2 * t;
+      const c = (a, b, c, d) => .5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
+      out.push([c(p0[0], p1[0], p2[0], p3[0]), c(p0[1], p1[1], p2[1], p3[1])]);
+    }
   }
-  const lip = [pt(th1), pt(th1 - TAU)];
-  return { spiral, septa, lip };
+  out.push(pts.at(-1));
+  return out;
+}
+const halfCurve = cr(HALF, 12);
+const widthAt = y => { // meia-largura do contorno na altura y
+  for (let i = 0; i < halfCurve.length - 1; i++) {
+    const [x0, y0] = halfCurve[i], [x1, y1] = halfCurve[i + 1];
+    if (y >= y0 && y <= y1) return x0 + (x1 - x0) * ((y - y0) / ((y1 - y0) || 1));
+  }
+  return 0;
+};
+const SPINES = {
+  full: [[21, 6, 42], [30, 12, 32], [37, 15.5, 24], [44, 16, 16], [51, 13, 11], [64, 8.5, 14], [74, 6.5, 12], [84, 5, 10]],
+  simple: [[33, 14, 28], [45, 15, 16], [65, 9, 12], [79, 7, 10]],
+};
+function symbolPaths({ spines = 'full' } = {}) {
+  const body = [...halfCurve, ...halfCurve.slice(0, -1).reverse().map(([x, y]) => [-x, y])];
+  const sp = [];
+  for (const [y, L, up] of SPINES[spines]) for (const side of [1, -1]) {
+    const x = widthAt(y) * side, e = .6;
+    const tx = widthAt(y + e) - widthAt(y - e), ty = 2 * e; // tangente (lado direito)
+    let nx = ty, ny = -tx; const l = Math.hypot(nx, ny); nx /= l; ny /= l; // normal para fora
+    const a = up * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+    const dx = nx * ca + ny * sa, dy = -nx * sa + ny * ca; // gira para cima
+    const a2 = (up + 18) * Math.PI / 180, dx2 = nx * Math.cos(a2) + ny * Math.sin(a2), dy2 = -nx * Math.sin(a2) + ny * Math.cos(a2);
+    const c = [x + side * dx * L * .55, y + dy * L * .55], t = [x + side * dx2 * L, y + dy2 * L];
+    sp.push([[x, y], c, t]);
+  }
+  const det = [];
+  for (const y of [9.5, 15, 20.5, 26]) { // suturas da espira
+    const w = widthAt(y);
+    det.push([[-w * .92, y + 1.2], [0, y + 2.6], [w * .92, y - 1]]);
+  }
+  det.push([[4.2, 31], [13.6, 44], [4.4, 58]]); // abertura
+  return { body, spines: sp, details: det };
 }
 // encaixa a geometria numa caixa e devolve strings de path
 function fit(geo, box, pad = 0) {
-  const all = [...geo.spiral, ...geo.septa.flat(), ...geo.lip];
+  const all = [...geo.body, ...geo.spines.flat(), ...geo.details.flat()];
   const xs = all.map(p => p[0]), ys = all.map(p => p[1]);
   const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
   const s = (box - 2 * pad) / Math.max(x1 - x0, y1 - y0);
   const ox = pad + ((box - 2 * pad) - (x1 - x0) * s) / 2, oy = pad + ((box - 2 * pad) - (y1 - y0) * s) / 2;
   const T = p => [f2(ox + (p[0] - x0) * s), f2(oy + (p[1] - y0) * s)];
-  const spiral = 'M' + geo.spiral.map(T).map(p => p.join(' ')).join('L');
-  const septa = geo.septa.map(([a, c, o]) => `M${T(a).join(' ')}Q${T(c).join(' ')} ${T(o).join(' ')}`).join('');
-  const lip = `M${T(geo.lip[0]).join(' ')}L${T(geo.lip[1]).join(' ')}`;
-  return { spiral, septa, lip };
+  const body = 'M' + geo.body.map(T).map(p => p.join(' ')).join('L') + 'Z';
+  const q = arr => arr.map(([a, c, o]) => `M${T(a).join(' ')}Q${T(c).join(' ')} ${T(o).join(' ')}`).join('');
+  return { body, spines: q(geo.spines), details: q(geo.details) };
 }
-function symbolSVG({ size = 100, stroke = C.nacar, sw = 3.2, bg = null, radius = 22, pad = 10, chambers = 11, septaOpacity = .85 } = {}) {
-  const g = fit(symbolPaths({ chambers }), size, pad);
+const markG = (g, sw, stroke, extra = '') => `<g${extra} fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"><path d="${g.body}"/><path d="${g.spines}" stroke-width="${f2(sw * .78)}"/><path d="${g.details}" stroke-width="${f2(sw * .6)}" opacity=".85"/></g>`;
+function symbolSVG({ size = 100, stroke = C.nacar, sw = 3, bg = null, radius = 22, pad = 8, spines = 'full' } = {}) {
+  const g = fit(symbolPaths({ spines }), size, pad);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">` +
-    (bg ? `<rect width="${size}" height="${size}" rx="${radius}" fill="${bg}"/>` : '') +
-    `<g fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">` +
-    `<path d="${g.spiral}"/><path d="${g.lip}"/><path d="${g.septa}" stroke-width="${f2(sw * .72)}" opacity="${septaOpacity}"/></g></svg>`;
+    (bg ? `<rect width="${size}" height="${size}" rx="${radius}" fill="${bg}"/>` : '') + markG(g, sw, stroke) + '</svg>';
 }
 
+// diagrama de construção para o guia da marca
+function construction() {
+  const S = 400, pad = 40, g = fit(symbolPaths(), S, pad);
+  let grid = '';
+  for (let i = 0; i <= 10; i++) { const v = f2(pad + (S - 2 * pad) * i / 10); grid += `M${v} ${pad}V${S - pad}M${pad} ${v}H${S - pad}`; }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${S} ${S}" width="${S}" height="${S}">` +
+    `<path d="${grid}" stroke="rgba(234,245,242,.08)" stroke-width="1" fill="none"/>` +
+    `<path d="M${S / 2} 20V${S - 20}" stroke="#6FF2DC" stroke-width="1" stroke-dasharray="4 5" opacity=".7"/>` +
+    markG(g, 4, '#F4E9DC') +
+    `<g font-family="Geist Mono, monospace" font-size="11" fill="#6FF2DC" letter-spacing="1"><text x="${S / 2 + 8}" y="32">EIXO</text><text x="${S - 26}" y="${S - 26}" text-anchor="end">ESPINHOS CURVAM PARA CIMA</text><text x="26" y="${S - 26}">GRADE 10 × 10</text></g></svg>`;
+}
 // ---------- texto em contornos ----------
 function textPath(font, str, x, y, size, tracking = 0) {
   let d = '', cx = x;
@@ -108,7 +150,7 @@ function horizontal({ ink = C.espuma, mark = C.nacar, sub = C.bio, bg = null } =
   const W = Math.ceil(ms + 26 + Math.max(word.width, line.width) + 8);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">` +
     (bg ? `<rect width="${W}" height="${H}" fill="${bg}"/>` : '') +
-    `<g transform="translate(0 ${(H - ms) / 2})" fill="none" stroke="${mark}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="${g.spiral}"/><path d="${g.lip}"/><path d="${g.septa}" stroke-width="2.4" opacity=".85"/></g>` +
+    markG(g, 3.2, mark, ` transform="translate(0 ${(H - ms) / 2})"`) +
     `<path fill="${ink}" d="${word.d}"/><path fill="${sub}" d="${line.d}"/></svg>`;
 }
 
@@ -126,14 +168,14 @@ function vertical({ ink = C.espuma, mark = C.nacar, sub = C.bio, bg = null } = {
   const g = fit(symbolPaths(), ms, 6);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">` +
     (bg ? `<rect width="${W}" height="${H}" fill="${bg}"/>` : '') +
-    `<g transform="translate(${cx - ms / 2} 12)" fill="none" stroke="${mark}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="${g.spiral}"/><path d="${g.lip}"/><path d="${g.septa}" stroke-width="2.8" opacity=".85"/></g>` +
+    markG(g, 3.8, mark, ` transform="translate(${cx - ms / 2} 12)"`) +
     `<path fill="${ink}" d="${a.d}${b2.d}"/><path fill="${sub}" d="${c.d}"/></svg>`;
 }
 
 // ---------- selo circular ----------
 function seal({ ink = C.nacar, ring = C.bio, bg = null } = {}) {
   const S = 400, cx = S / 2, R = 162, size = 21;
-  const text = 'MUSEU DAS CONCHAS · ITAPIRUBÁ · MAIS DE 2.000 ESPÉCIES · ';
+  const text = 'MUSEU DAS CONCHAS · ITAPIRUBÁ · MAIS DE 3.500 ESPÉCIES · ';
   const glyphs = F.mono.stringToGlyphs(text);
   const adv = glyphs.map(g => g.advanceWidth / F.mono.unitsPerEm * size);
   const total = adv.reduce((a, b) => a + b, 0);
@@ -159,15 +201,16 @@ function seal({ ink = C.nacar, ring = C.bio, bg = null } = {}) {
     `<circle cx="${cx}" cy="${cx}" r="${R + 22}" fill="none" stroke="${ring}" stroke-width="1.5" opacity=".7"/>` +
     `<circle cx="${cx}" cy="${cx}" r="${R - 26}" fill="none" stroke="${ring}" stroke-width="1.5" opacity=".7"/>` +
     `<path fill="${ink}" d="${d}"/>` +
-    `<g transform="translate(${cx - 95} ${cx - 95})" fill="none" stroke="${ink}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="${g.spiral}"/><path d="${g.lip}"/><path d="${g.septa}" stroke-width="3.6" opacity=".85"/></g></svg>`;
+    markG(g, 4.6, ink, ` transform="translate(${cx - 95} ${cx - 95})"`) + '</svg>';
 }
 
 const files = {
   'simbolo.svg': symbolSVG(),
   'simbolo-mono.svg': symbolSVG({ stroke: 'currentColor' }),
   'simbolo-escuro.svg': symbolSVG({ stroke: C.crepusculo }),
-  'favicon.svg': symbolSVG({ size: 64, sw: 4.2, bg: C.crepusculo, radius: 14, pad: 9, chambers: 7, stroke: C.nacar, septaOpacity: .9 }),
-  'icone-app.svg': symbolSVG({ size: 512, sw: 22, bg: C.crepusculo, radius: 112, pad: 92, chambers: 9, stroke: C.nacar }),
+  'favicon.svg': symbolSVG({ size: 64, sw: 3.6, bg: C.crepusculo, radius: 14, pad: 7, spines: 'simple' }),
+  'icone-app.svg': symbolSVG({ size: 512, sw: 15, bg: C.crepusculo, radius: 112, pad: 84 }),
+  'construcao.svg': construction(),
   'logo-horizontal.svg': horizontal(),
   'logo-horizontal-areia.svg': horizontal({ ink: C.abismo, mark: C.crepusculo, sub: '#0F6E78' }),
   'logo-vertical.svg': vertical(),

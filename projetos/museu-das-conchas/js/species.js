@@ -63,7 +63,7 @@ export const SPECIES = [
     onde: 'Mar Mediterrâneo', tamanho: 'até cerca de 9 cm', cm: 9, prof: 'fundos de areia e lama', tags: [],
     resumo: 'O roxo dos imperadores saía daqui.',
     texto: 'Os fenícios extraíam deste caramujo a púrpura-de-tiro, um corante tão caro que virou símbolo de poder em Roma. Eram necessários milhares de caramujos para tingir um único tecido.',
-    fato: 'Os espinhos ajudam a proteger a concha de peixes e caranguejos que tentam quebrá-la.',
+    fato: 'Os espinhos ajudam a proteger a concha de peixes e caranguejos que tentam quebrá-la. E é um múrex que aparece no símbolo do Museu das Conchas.',
   },
   {
     id: 'argonauta', n: '009', nome: 'Argonauta', sci: 'Argonauta argo', autor: 'Linnaeus, 1758',

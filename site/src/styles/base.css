@@ -1,0 +1,120 @@
+/* =========================================================================
+   LUMINI — base do site
+   Tokens em tokens.css (cópia de brand/tokens/tokens.css). Aqui ficam o reset,
+   a tipografia, o layout, os componentes compartilhados (botões, chips, rótulos)
+   e as utilidades de movimento usadas por todas as seções.
+   ========================================================================= */
+@import './tokens.css';
+
+:root {
+  color-scheme: dark;
+  --gutter: var(--lu-gutter);
+  --header-h: 72px;
+  --section-pad: clamp(96px, 12vw, 180px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--lu-noite); -webkit-text-size-adjust: 100%; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+body {
+  margin: 0; background: var(--lu-noite); color: var(--lu-luz);
+  font-family: var(--lu-font-texto); font-size: 16px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; text-rendering: optimizeLegibility;
+}
+body.is-loading { overflow: hidden; }
+::selection { background: var(--lu-lume); color: var(--lu-noite); }
+img, video, svg, canvas { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+h1, h2, h3, h4, h5, p, ul, ol, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+h1, h2, h3, h4 { font-weight: 400; text-wrap: balance; }
+:focus-visible { outline: 2px solid var(--lu-lume); outline-offset: 4px; border-radius: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* ---------- layout ---------- */
+.wrap { width: 100%; max-width: 1600px; margin-inline: auto; padding-inline: var(--gutter); }
+.grid12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(12px, 2vw, 24px); }
+.section { position: relative; z-index: 2; padding-block: var(--section-pad); }
+main { position: relative; z-index: 2; }
+
+/* ---------- tipografia ---------- */
+.mono, .label {
+  font-family: var(--lu-font-mono); font-size: 11px; line-height: 1.5; font-weight: 400;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--lu-nevoa);
+}
+.label { display: inline-flex; align-items: center; gap: 10px; }
+.label::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--lu-lume); box-shadow: 0 0 10px var(--lu-lume); }
+.s, em.s { font-family: var(--lu-font-acento); font-style: italic; font-weight: 400; letter-spacing: -.01em; color: var(--lu-lume); }
+.display {
+  font-family: var(--lu-font-display); font-weight: 300; line-height: .9; letter-spacing: -.05em;
+}
+.d-mega { font-size: clamp(64px, 2rem + 10vw, 232px); }
+.d-1 { font-size: clamp(52px, 1.6rem + 7vw, 160px); }
+.d-2 { font-size: clamp(40px, 1.4rem + 4.4vw, 104px); }
+.d-3 { font-size: clamp(30px, 1.2rem + 2.4vw, 64px); line-height: 1; letter-spacing: -.035em; }
+.lead { font-size: clamp(18px, 1.05rem + .4vw, 23px); line-height: 1.5; color: var(--lu-luz); max-width: 34em; }
+.body-text { color: var(--lu-nevoa); max-width: 60ch; }
+.muted { color: var(--lu-nevoa); }
+.lit { color: var(--lu-lume); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* ---------- botões (do brand book) ---------- */
+.btn {
+  --h: 54px; position: relative; display: inline-flex; align-items: center; gap: 12px; height: var(--h);
+  padding: 0 26px 0 20px; border-radius: 999px; border: 1px solid rgba(242,239,232,.16);
+  background: rgba(15,17,23,.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  color: var(--lu-luz); font: 500 15px/1 var(--lu-font-texto); white-space: nowrap;
+  overflow: hidden; isolation: isolate; transition: color .4s var(--lu-ease-lume), border-color .4s;
+}
+.btn .dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--lu-lume); box-shadow: 0 0 12px rgba(255,181,71,.9); flex: none; }
+.btn .dot::before { content: ""; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--lu-lume); transform: scale(1); transition: transform .7s var(--lu-ease-lume); z-index: -1; }
+.btn:hover { color: var(--lu-noite); border-color: var(--lu-lume); }
+.btn:hover .dot::before { transform: scale(100); }
+.btn:hover .dot { background: var(--lu-noite); box-shadow: none; }
+.btn .arr { transition: transform .4s var(--lu-ease-lume); }
+.btn:hover .arr { transform: translateX(4px); }
+.btn--solid { background: var(--lu-lume); color: var(--lu-noite); border-color: var(--lu-lume); }
+.btn--solid .dot { background: var(--lu-noite); box-shadow: none; }
+.btn--solid .dot::before { background: var(--lu-luz); }
+.btn--solid:hover { border-color: var(--lu-luz); }
+.btn--sm { --h: 42px; font-size: 13.5px; padding: 0 18px 0 15px; }
+.btn--ghost { background: transparent; border-color: transparent; backdrop-filter: none; padding-inline: 2px; }
+.btn--ghost::after { content: ""; position: absolute; left: 2px; right: 2px; bottom: 12px; height: 1px; background: var(--lu-lume); transform: scaleX(0); transform-origin: right; transition: transform .6s var(--lu-ease-lume); }
+.btn--ghost:hover { color: var(--lu-luz); border-color: transparent; }
+.btn--ghost:hover::after { transform: scaleX(1); transform-origin: left; }
+.btn--ghost:hover .dot::before { transform: scale(1); }
+.btn--ghost:hover .dot { background: var(--lu-lume); box-shadow: 0 0 12px rgba(255,181,71,.9); }
+
+.chip { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(242,239,232,.14); font-size: 13px; color: var(--lu-luz); background: rgba(8,9,13,.4); white-space: nowrap; }
+
+/* Link com sublinhado de luz */
+.ulink { position: relative; display: inline-block; }
+.ulink::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .6s var(--lu-ease-lume); }
+.ulink:hover::after { transform: scaleX(1); transform-origin: left; }
+
+/* Painel de vidro (sobre o palco de vídeo) */
+.glass { background: rgba(12,13,18,.55); border: 1px solid rgba(242,239,232,.09); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); border-radius: var(--lu-r-2); }
+
+/* ---------- grão de filme (fixo) ---------- */
+.grain {
+  position: fixed; inset: -50%; z-index: 90; pointer-events: none; opacity: .065;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1s steps(6) infinite;
+}
+@keyframes grain { 0%{transform:translate(0,0)} 20%{transform:translate(-3%,2%)} 40%{transform:translate(2%,-3%)} 60%{transform:translate(-2%,-1%)} 80%{transform:translate(3%,3%)} 100%{transform:translate(0,0)} }
+
+/* ---------- utilidades de revelação (usadas por lib/reveal.js) ----------
+   O conteúdo é visível por padrão. O JS só esconde o que ainda vai animar
+   (classe .js-reveal aplicada em tempo de execução), então sem JS nada some. */
+.split-line { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
+.split-line > * { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  .grain { animation: none; }
+}

@@ -1,0 +1,113 @@
+/* ==========================================================================
+   LUMINI — Design Tokens v1.0
+   Fonte única de verdade para cores, tipografia, espaço, raios e movimento.
+   Importe este arquivo no site: <link rel="stylesheet" href="tokens.css">
+   Fontes (Google Fonts):
+   https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&family=Instrument+Serif:ital@1&family=Martian+Mono:wght@300..600&display=swap
+   ========================================================================== */
+
+:root {
+  /* ---- Cor · Base (noite) ------------------------------------------------ */
+  --lu-noite:    #08090D;  /* fundo principal — 70% da composição            */
+  --lu-carvao:   #0F1117;  /* superfícies, cards                              */
+  --lu-grafite:  #171A22;  /* superfícies elevadas, hovers                    */
+  --lu-linha:    #262A35;  /* bordas, divisórias                               */
+  --lu-nevoa:    #8E93A0;  /* texto secundário (6.5:1 sobre noite)            */
+  --lu-luz:      #F2EFE8;  /* texto principal, "luz do dia" (17.3:1)          */
+
+  /* ---- Cor · Luz (temperaturas) ----------------------------------------- */
+  --lu-halo:     #FFE3B0;  /* 3500 K — brilho suave, realces                  */
+  --lu-lume:     #FFB547;  /* 2700 K — cor da marca, CTAs, pontos de luz       */
+  --lu-brasa:    #FF6A2B;  /* 1900 K — acento quente, hover/ativo, gradientes  */
+  --lu-cobre:    #B4460F;  /* acento para fundos claros (4.8:1 sobre luz)     */
+  --lu-pedra:    #5B5F6B;  /* texto secundário em fundos claros (5.5:1)       */
+
+  /* ---- Cor · Semânticas (UI) --------------------------------------------- */
+  --lu-sucesso:  #5BD69A;
+  --lu-alerta:   #FFB547;
+  --lu-erro:     #FF5D5D;
+
+  /* ---- Gradientes ------------------------------------------------------- */
+  --lu-grad-ignicao: radial-gradient(circle at 50% 50%, #FFF6E0 0%, #FFB547 22%, #FF6A2B 48%, rgba(255,106,43,0) 72%);
+  --lu-grad-halo:    radial-gradient(60% 60% at 50% 0%, rgba(255,181,71,.28) 0%, rgba(255,106,43,.08) 45%, rgba(8,9,13,0) 100%);
+  --lu-grad-feixe:   linear-gradient(180deg, rgba(255,227,176,0) 0%, rgba(255,181,71,.9) 55%, #FFF6E0 100%);
+  --lu-grad-crepusculo: linear-gradient(180deg, #08090D 0%, #171A22 55%, #3A2318 85%, #FF6A2B 130%);
+
+  /* ---- Tipografia ------------------------------------------------------- */
+  --lu-font-display: "Funnel Display", "Funnel Sans", ui-sans-serif, system-ui, sans-serif;
+  --lu-font-texto:   "Funnel Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --lu-font-acento:  "Instrument Serif", ui-serif, Georgia, serif;   /* sempre itálico */
+  --lu-font-mono:    "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Escala fluida (min 375px → max 1440px) */
+  --lu-fs-mega:  clamp(4rem, 2.2rem + 9.6vw, 13rem);    /* 64 → 208 — heróis       */
+  --lu-fs-d1:    clamp(3rem, 1.9rem + 5.6vw, 7.5rem);   /* 48 → 120                 */
+  --lu-fs-d2:    clamp(2.25rem, 1.6rem + 3.2vw, 4.5rem);/* 36 → 72                  */
+  --lu-fs-h1:    clamp(1.875rem, 1.5rem + 1.8vw, 3rem); /* 30 → 48                  */
+  --lu-fs-h2:    clamp(1.5rem, 1.3rem + 1vw, 2.125rem); /* 24 → 34                  */
+  --lu-fs-h3:    1.375rem;                              /* 22                       */
+  --lu-fs-lead:  clamp(1.125rem, 1.05rem + .35vw, 1.375rem); /* 18 → 22             */
+  --lu-fs-body:  1rem;                                  /* 16                       */
+  --lu-fs-small: .875rem;                               /* 14                       */
+  --lu-fs-label: .6875rem;                              /* 11 — mono, caixa-alta    */
+
+  --lu-lh-display: .92;
+  --lu-lh-heading: 1.08;
+  --lu-lh-body:    1.6;
+  --lu-ls-display: -0.04em;
+  --lu-ls-heading: -0.02em;
+  --lu-ls-label:   0.12em;
+
+  /* ---- Espaço (base 4) -------------------------------------------------- */
+  --lu-s-1: 4px;   --lu-s-2: 8px;   --lu-s-3: 12px;  --lu-s-4: 16px;
+  --lu-s-5: 24px;  --lu-s-6: 32px;  --lu-s-7: 48px;  --lu-s-8: 64px;
+  --lu-s-9: 96px;  --lu-s-10: 128px; --lu-s-11: 192px;
+  --lu-gutter: clamp(16px, 4vw, 48px);
+  --lu-max: 1440px;
+
+  /* ---- Raios & bordas --------------------------------------------------- */
+  --lu-r-0: 0;          /* blocos editoriais, imagens grandes */
+  --lu-r-1: 6px;        /* inputs, tags quadradas             */
+  --lu-r-2: 14px;       /* cards                              */
+  --lu-r-pill: 999px;   /* botões, chips                      */
+  --lu-borda: 1px solid var(--lu-linha);
+
+  /* ---- Sombras de luz (glow) ------------------------------------------- */
+  --lu-glow-s: 0 0 12px rgba(255,181,71,.45);
+  --lu-glow-m: 0 0 32px rgba(255,181,71,.35), 0 0 4px rgba(255,227,176,.6);
+  --lu-glow-l: 0 0 120px rgba(255,106,43,.28), 0 0 40px rgba(255,181,71,.35);
+
+  /* ---- Movimento -------------------------------------------------------- */
+  --lu-ease-lume:     cubic-bezier(0.16, 1, 0.3, 1);     /* entradas (expo-out)       */
+  --lu-ease-eclipse:  cubic-bezier(0.76, 0, 0.24, 1);    /* transições, cortinas      */
+  --lu-ease-faisca:   cubic-bezier(0.34, 1.56, 0.64, 1); /* micro, leve overshoot     */
+  --lu-ease-brisa:    cubic-bezier(0.45, 0, 0.55, 1);    /* loops, respiração         */
+
+  --lu-dur-instante: 120ms;  /* feedback de toque                  */
+  --lu-dur-rapido:   240ms;  /* hovers                             */
+  --lu-dur-base:     480ms;  /* entradas de componentes            */
+  --lu-dur-lento:    900ms;  /* títulos, revelações                */
+  --lu-dur-cena:     1400ms; /* transições de página, preloader    */
+  --lu-stagger:      60ms;   /* atraso entre linhas/letras         */
+
+  /* ---- Camadas ---------------------------------------------------------- */
+  --lu-z-base: 0; --lu-z-header: 50; --lu-z-overlay: 80; --lu-z-cursor: 100; --lu-z-loader: 200;
+
+  /* ---- Breakpoints (referência — use em media queries) ----------------- */
+  /* sm 480 · md 768 · lg 1024 · xl 1280 · 2xl 1440                        */
+}
+
+/* Modo Dia — documentos, propostas e páginas claras */
+.lu-dia {
+  --lu-fundo: var(--lu-luz);
+  --lu-texto: var(--lu-noite);
+  --lu-texto-2: var(--lu-pedra);
+  --lu-acento: var(--lu-cobre);
+  --lu-borda: 1px solid #D9D5CB;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --lu-dur-rapido: 0ms; --lu-dur-base: 0ms; --lu-dur-lento: 0ms; --lu-dur-cena: 0ms; --lu-stagger: 0ms;
+  }
+}

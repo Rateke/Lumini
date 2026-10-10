@@ -5,7 +5,13 @@
 A Lumini cria sites para restaurantes, autônomos, pequenas e grandes empresas.
 Fundadores: **Fernando Rateke** e **Cauã Canova**.
 
-Este repositório guarda a **identidade visual** da marca, base para o futuro site.
+Este repositório guarda a **identidade visual** da marca, base para o futuro site, e os **projetos** feitos com ela.
+
+## Projetos
+
+| Projeto | O que é |
+|---|---|
+| [`projetos/museu-das-conchas/`](projetos/museu-das-conchas/) | Site conceito do **Museu das Conchas Itapirubá** (Imbituba, SC): um mergulho do topo ao abismo e de volta à praia, com oceano em WebGL, 12 conchas 3D geradas por código, horário ao vivo, calculadora de ingressos, agendamento de escolas e um guia da marca do museu. Detalhes e fontes em [`docs/museu-das-conchas.md`](docs/museu-das-conchas.md). |
 
 ## O que tem aqui
 
@@ -29,6 +35,8 @@ npx serve brand
 ```
 
 As fontes vêm do Google Fonts: Funnel Display, Funnel Sans, Instrument Serif e Martian Mono (todas OFL, gratuitas).
+
+Para ver o site do museu: `npx serve projetos/museu-das-conchas` (ele usa módulos ES, então precisa de servidor).
 
 ## Regenerar os arquivos
 

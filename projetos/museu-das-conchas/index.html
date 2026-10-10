@@ -12,7 +12,8 @@
 <meta property="og:site_name" content="Museu das Conchas Itapirubá">
 <meta property="og:title" content="Museu das Conchas Itapirubá · Um lugar como você nunca viu">
 <meta property="og:description" content="Mais de 3.500 espécies de conchas de todos os oceanos, à beira da praia de Itapirubá, Imbituba (SC).">
-<meta property="og:image" content="assets/og.jpg">
+<meta property="og:url" content="https://www.museudasconchas.com.br/">
+<meta property="og:image" content="https://www.museudasconchas.com.br/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -509,8 +510,10 @@
         <div class="calc" data-calc>
           <div class="calc__row"><span>Adultos</span><span class="stepper"><button type="button" data-step="a:-1" aria-label="Menos um adulto">−</button><output data-out="a">2</output><button type="button" data-step="a:1" aria-label="Mais um adulto">+</button></span></div>
           <div class="calc__row"><span>Crianças e idosos</span><span class="stepper"><button type="button" data-step="c:-1" aria-label="Menos uma criança ou idoso">−</button><output data-out="c">2</output><button type="button" data-step="c:1" aria-label="Mais uma criança ou idoso">+</button></span></div>
-          <div class="calc__total"><span>Total estimado</span><b class="tnum" data-total>R$ 10,00</b></div>
-          <p class="calc__tip" data-tip aria-live="polite"></p>
+          <label class="calc__fam" for="calc-fam"><input type="checkbox" id="calc-fam" data-fam><span>Somos uma família<small>Um ingresso família vale para até 5 pessoas</small></span></label>
+          <ul class="calc__lines" data-lines></ul>
+          <div class="calc__total"><span>Total</span><b class="tnum" data-calc-total>R$ 15,00</b></div>
+          <p class="calc__tip" data-calc-tip aria-live="polite"></p>
         </div>
       </div>
       <div class="panel rv" style="--d:.16s">
@@ -632,7 +635,7 @@
     <div class="ftr__bottom">
       <span>© <span data-year>2026</span> Museu das Conchas Itapirubá</span>
       <span>Modelos 3D ilustrativos, gerados por computador.</span>
-      <a class="lumini" href="https://claude.ai/artifact/Lt3nBQDAdgPmxwHM93gESY" target="_blank" rel="noopener"><i aria-hidden="true"></i>Site conceito por Lumini</a>
+      <span class="lumini"><i aria-hidden="true"></i>Site por Lumini</span>
     </div>
   </div>
 </footer>

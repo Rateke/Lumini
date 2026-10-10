@@ -5,15 +5,15 @@
 // O texto é convertido em contornos com opentype.js, então os SVGs não dependem
 // de fontes instaladas.
 //
-// Uso (precisa de opentype.js instalado na pasta atual):
-//   npm i opentype.js && node tools/museu-logo.mjs
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+// Uso: cd tools && npm install && npm run logo
+// Além dos SVGs, atualiza o símbolo embutido em index.html e assets/icones.svg.
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 
-const require = createRequire(process.cwd() + '/');
+const require = createRequire(import.meta.url);
 const opentype = require('opentype.js');
 const out = resolve(dirname(fileURLToPath(import.meta.url)), '../projetos/museu-das-conchas/assets/logo');
 mkdirSync(out, { recursive: true });
@@ -221,4 +221,14 @@ const files = {
 for (const [n, s] of Object.entries(files)) writeFileSync(resolve(out, n), s + '\n');
 // paths crus para embutir no HTML
 writeFileSync(resolve(out, 'simbolo-paths.json'), JSON.stringify(fit(symbolPaths(), 100, 6)) + '\n');
+// atualiza o símbolo embutido no site (sprite do index.html, pré-carregamento e assets/icones.svg)
+const site = resolve(out, '../..'), idx = resolve(site, 'index.html');
+if (existsSync(idx)) {
+  const P = fit(symbolPaths(), 100, 6);
+  let h = readFileSync(idx, 'utf8');
+  h = h.replace(/<symbol id="mk" viewBox="0 0 100 100">[\s\S]*?<\/symbol>/, `<symbol id="mk" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.4"><path d="${P.body}"/><path d="${P.spines}" stroke-width="2.6"/><path d="${P.details}" stroke-width="2" opacity=".85"/></g></symbol>`);
+  h = h.replace(/<svg class="loader__mark"[\s\S]*?<\/svg>/, `<svg class="loader__mark" viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#0A3550" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"><path d="${P.body}"/><path d="${P.spines}" stroke-width="1.8"/><path d="${P.details}" stroke-width="1.4"/></g></svg>`);
+  writeFileSync(idx, h);
+  writeFileSync(resolve(site, 'assets/icones.svg'), `<svg xmlns="http://www.w3.org/2000/svg"><defs>${h.match(/<defs>([\s\S]*?)<\/defs>/)[1]}</defs></svg>\n`);
+}
 console.log('ok:', Object.keys(files).join(', '));

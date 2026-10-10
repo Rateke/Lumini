@@ -497,6 +497,12 @@ main { position: relative; z-index: 2; }
 .calc__total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 10px; border-top: 1px dashed var(--linha); }
 .calc__total b { font-family: var(--f-display); font-size: 32px; font-weight: 400; font-variation-settings: "opsz" 72, "SOFT" 100; }
 .calc__tip { color: var(--bio); font-size: 13.5px; min-height: 1.4em; }
+.calc__fam { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0 2px; cursor: pointer; font-size: 15px; }
+.calc__fam input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--bio); flex: none; }
+.calc__fam small { display: block; color: var(--nevoa); font-size: 12.5px; }
+.calc__lines { display: grid; gap: 6px; padding-top: 8px; border-top: 1px dashed var(--linha); }
+.calc__lines li { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--bruma); }
+.calc__lines b { font-weight: 500; color: var(--espuma); white-space: nowrap; }
 .addr { font-family: var(--f-display); font-weight: 300; font-size: clamp(26px, 2.2vw, 32px); line-height: 1.15; font-variation-settings: "opsz" 72, "SOFT" 100; letter-spacing: -.01em; }
 .btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .tips { margin-top: clamp(14px, 1.4vw, 20px); display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 1.4vw, 20px); }

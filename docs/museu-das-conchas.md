@@ -34,7 +34,7 @@ Slogan (o do próprio museu): **Um lugar como você nunca viu.**
 - **Oceano em WebGL** atrás de tudo: raios de sol, cáusticas, superfície vista de baixo, neve marinha que sobe enquanto você desce, bolhas e bioluminescência no fundo.
 - **Conchas 3D procedurais**: 12 espécies modeladas por código com o modelo de crescimento em espiral logarítmica (Raup 1966, Cortie 1989). Cada ficha tem o modelo para girar.
 - **Horário ao vivo** no fuso de Brasília, com temporada, feriados nacionais e Carnaval ("Aberto agora · até as 18h").
-- **Calculadora de ingressos** que sugere o ingresso família quando sai mais barato.
+- **Calculadora de ingressos** com a conta discriminada linha a linha. O ingresso família (R$ 10,00 para até 5 pessoas) só entra quando a pessoa marca "Somos uma família" e quando sai mais barato.
 - **Nada depende de banco de dados.** O site não guarda nenhuma informação: agendar visita, doar conchas e tirar dúvidas abre o WhatsApp do museu com uma mensagem pronta; o tour vai para o Google Maps; o catálogo, para o Facebook; avaliações, para o Google. Tem também um botão fixo de WhatsApp.
 - **Tour 360°** com as imagens do Google Maps, que só carrega quando a pessoa toca em "Começar o tour", e um link para abrir direto no Google Maps.
 - **Som do mar** opcional, sintetizado ao vivo, que fica mais grave com a profundidade.
@@ -99,7 +99,7 @@ As curiosidades (cauri como moeda, púrpura-de-tiro, escalária falsificada com 
 npx serve projetos/museu-das-conchas        # o site usa módulos ES, precisa de servidor
 
 node tools/museu-render-conchas.mjs         # exporta as conchas 3D em WebP (Playwright)
-npm i opentype.js && node tools/museu-logo.mjs   # regenera os SVGs da marca
+npm i opentype.js && node tools/museu-logo.mjs   # regenera os SVGs da marca e o símbolo dentro do index.html
 node tools/museu-tour.mjs /tmp/tour 1440 900 1   # capturas da página inteira para revisão
 ```
 

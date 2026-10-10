@@ -549,26 +549,50 @@ function status() {
 /* ---------------------------------------------------------------
    Calculadora de ingressos
    --------------------------------------------------------------- */
+// Preços: adulto R$ 5,00; crianças e idosos R$ 2,50; família R$ 10,00 (um ingresso
+// para até 5 pessoas da mesma família). O ingresso família só entra quando a pessoa
+// diz que é uma família e quando sai mais barato; ele cobre primeiro os adultos.
+const PRICE = { a: 5, c: 2.5, fam: 10, famMax: 5 };
+export function quoteTickets(a, c, family) {
+  const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+  const plain = a * PRICE.a + c * PRICE.c;
+  const individual = (na, nc) => [
+    ...(na ? [[`${plural(na, 'adulto', 'adultos')} × ${brl.format(PRICE.a)}`, na * PRICE.a]] : []),
+    ...(nc ? [[`${plural(nc, 'criança/idoso', 'crianças/idosos')} × ${brl.format(PRICE.c)}`, nc * PRICE.c]] : []),
+  ];
+  if (a + c === 0) return { lines: [], total: 0, tip: 'Quantas pessoas vêm?' };
+  const fa = Math.min(a, PRICE.famMax), fc = Math.min(c, PRICE.famMax - fa);
+  const withFamily = PRICE.fam + (a - fa) * PRICE.a + (c - fc) * PRICE.c;
+  const saves = plain - withFamily;
+  if (family && saves > 0) {
+    const who = [fa && plural(fa, 'adulto', 'adultos'), fc && plural(fc, 'criança/idoso', 'crianças/idosos')].filter(Boolean).join(' + ');
+    return {
+      lines: [[`1 ingresso família (${who})`, PRICE.fam], ...individual(a - fa, c - fc)],
+      total: withFamily,
+      tip: `Com o ingresso família vocês economizam ${brl.format(saves)}.`,
+    };
+  }
+  const tip = family ? (saves === 0 ? 'Para esse grupo, o ingresso família custa o mesmo que os individuais.' : 'Para esse grupo, os ingressos individuais saem mais em conta.')
+    : saves > 0 ? `Se vocês são uma família, marquem a opção acima: fica ${brl.format(withFamily)}.` : '';
+  return { lines: individual(a, c), total: plain, tip };
+}
+
 function calc() {
+  // tudo dentro do bloco da calculadora (há outros [data-*] parecidos na página)
+  const box = $('[data-calc]'); if (!box) return;
   const st = { a: 2, c: 2 };
-  const best = (a, c) => {
-    let min = Infinity, fam = 0;
-    for (let k = 0; k <= Math.ceil((a + c) / 5); k++) {
-      const cov = 5 * k, ra = Math.max(0, a - cov), rc = Math.max(0, c - Math.max(0, cov - a));
-      const v = 10 * k + 5 * ra + 2.5 * rc;
-      if (v < min - 1e-9) { min = v; fam = k; }
-    }
-    return { min, fam, plain: 5 * a + 2.5 * c };
-  };
+  const fam = $('[data-fam]', box);
   const render = () => {
-    $('[data-out="a"]').textContent = st.a; $('[data-out="c"]').textContent = st.c;
-    const r = best(st.a, st.c);
-    $('[data-total]').textContent = brl.format(r.min);
-    $('[data-tip]').textContent = r.fam && r.plain > r.min ? `Com ${r.fam > 1 ? r.fam + ' ingressos família' : 'o ingresso família'}, a família economiza ${brl.format(r.plain - r.min)}.` : (st.a + st.c === 0 ? 'Quantas pessoas vêm?' : '');
+    $('[data-out="a"]', box).textContent = st.a; $('[data-out="c"]', box).textContent = st.c;
+    const q = quoteTickets(st.a, st.c, fam.checked);
+    $('[data-lines]', box).innerHTML = q.lines.map(([l, v]) => `<li><span>${l}</span><b class="tnum">${brl.format(v)}</b></li>`).join('');
+    $('[data-calc-total]', box).textContent = brl.format(q.total);
+    $('[data-calc-tip]', box).textContent = q.tip;
   };
-  $$('[data-step]').forEach(b => b.addEventListener('click', () => {
+  $$('[data-step]', box).forEach(b => b.addEventListener('click', () => {
     const [k, v] = b.dataset.step.split(':'); st[k] = Math.max(0, Math.min(30, st[k] + +v)); render();
   }));
+  fam.addEventListener('change', render);
   render();
 }
 
